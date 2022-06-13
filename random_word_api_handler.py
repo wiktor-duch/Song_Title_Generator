@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import List
 import requests
+from exceptions import RandomWordAPIException
 
 class RandomWordAPIHandler:
     def __init__(self) -> None:
@@ -14,7 +15,6 @@ class RandomWordAPIHandler:
         
         # Check if the query was successful
         if response.status_code != 200:
-            print("Error: Random Words API query returned " + str(response.status_code))
-            return None
+            raise RandomWordAPIException(f"Error: Random Words API query returned {response.status_code}")
 
         return response.json()
