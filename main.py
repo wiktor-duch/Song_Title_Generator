@@ -1,7 +1,7 @@
 """This module is the main class"""
 
 from exceptions import RandomWordAPIException
-from random_word_api_handler import RandomWordAPIHandler
+from api_handler import get_random_words
 import sys
 from visualization import display_words
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # Get the required number of random words from the Random Word API
     while True:
         try:
-            random_words = RandomWordAPIHandler().get_random_words(num_words)
+            random_words = get_random_words(num_words)
             break
         except RandomWordAPIException:
             # Ask the user to try again

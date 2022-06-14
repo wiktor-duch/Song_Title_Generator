@@ -3,7 +3,7 @@
 from __future__ import annotations
 import requests
 from typing import List, Dict
-from exceptions import MusicBrainzAPIException
+from exceptions import MusicBrainzAPIException, RandomWordAPIException
 
 def get_songs(words:List[str]) -> Dict:
     results = dict()
@@ -54,7 +54,35 @@ def get_songs(words:List[str]) -> Dict:
             raise MusicBrainzAPIException(f"Error: MusicBrainz API query returned {response.status_code}.")
         
     return results
+
+def get_random_words(num:int) -> List[str]:
+    random_words = set()
+
+    # Query the Random Word API
+    response = requests.get("https://random-word-api.herokuapp.com/word?number=" + str(num))
     
-songs = get_songs(["a","zxzcxzxczxvzxvczxczx","b", "a a", "a a a"])
-print(songs)
-# print(requests.get(f"https://musicbrainz.org/ws/2/recording/?query=recording:zxzcxzxczxvzxvczxczxv&limit=1&fmt=json").json())
+    # Check if the query was successful
+    if response.status_code == 200:
+        random_words = set(response.json())
+    else:
+        raise RandomWordAPIException(f"Error: Random Words API query returned {response.status_code}.")
+
+    if len(random_words) >= num:
+        return sorted(random_words)
+    else:
+        # For loop ensures that it does not query API infinitely
+        for _ in range(100):
+            # Query the Random Word API
+            response = requests.get("https://random-word-api.herokuapp.com/word")
+            
+            # Check if the query was successful
+            if response.status_code != 200:
+                raise RandomWordAPIException(f"Error: Random Words API query returned {response.status_code}.")
+
+            random_words.add(response.json()[0])
+            
+            if len(random_words) >= num:
+                return sorted(random_words)
+    
+    # Raise exception if the for loop has terminated
+    raise RandomWordAPIException(f"Error: Could not find the required number of unique words ({num}).")
