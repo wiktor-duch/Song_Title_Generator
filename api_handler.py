@@ -41,13 +41,20 @@ def get_songs(words:List[str]) -> Dict:
                     result["title"] = title
 
                     # Get artists
-                    artists = list()
-                    for i in range(len(response.json().get("recordings")[num].get("artist-credit"))):
-                        artists.append(response.json().get("recordings")[num].get("artist-credit")[i].get("name"))
-                    result["artists"] = artists
+                    if "artist-credit" in response.json().get("recordings")[num].keys():
+                        artists = list()
+                        for i in range(len(response.json().get("recordings")[num].get("artist-credit"))):
+                            artists.append(response.json().get("recordings")[num].get("artist-credit")[i].get("name"))
+                        result["artists"] = artists
+                    else:
+                        result["artists"] = "None"
 
                     # Get album
-                    result["album"] = response.json().get("recordings")[num].get("releases")[0].get("title")
+                    if ("releases" in response.json().get("recordings")[num].keys()
+                        and "title" in response.json().get("recordings")[num].get("releases")[0].keys()):
+                        result["album"] = response.json().get("recordings")[num].get("releases")[0].get("title")
+                    else:
+                        result["album"] = "None"
 
                     results[word] = result
         else:
