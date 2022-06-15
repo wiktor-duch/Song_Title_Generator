@@ -1,9 +1,9 @@
 """This module is the main class"""
 
-from exceptions import RandomWordAPIException
-from api_handler import get_random_words
+from exceptions import MusicBrainzAPIException, RandomWordAPIException
+from api_handler import get_random_words, get_songs
 import sys
-from visualization import display_words
+from visualization import display_songs, display_words
 
 if __name__ == "__main__":
     print("Song Title Generator\n")
@@ -18,6 +18,8 @@ if __name__ == "__main__":
                 print("Entered number must be between 5 and 20!")
         except ValueError:
             print('You must enter a number between 5 and 20!')
+
+    print("\nLoading words...\n")
 
     # Get the required number of random words from the Random Word API
     while True:
@@ -35,3 +37,21 @@ if __name__ == "__main__":
 
     # Display the words to the user
     display_words(random_words)
+
+    print("\nLoading recordings...\n")
+    
+    # Get titles for each word
+    while True:
+        try:
+            songs = get_songs(random_words)
+            break
+        except MusicBrainzAPIException:
+            # Ask the user to try again
+            print("\nERROR: An error occured when communicating with MusicBrainz API.\n")
+            answer = input("Would you like to try again [yes/no]? ")
+            
+            # If the answer is negative, exit the application
+            if answer not in ["Yes", "yes", "Y", "y"]:
+                sys.exit()
+                
+    display_songs(songs)
