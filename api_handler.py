@@ -4,10 +4,12 @@ from __future__ import annotations
 import requests
 from typing import List, Dict
 from exceptions import MusicBrainzAPIException, RandomWordAPIException
+import time
 
 def get_songs(words:List[str]) -> Dict:
     results = dict()
     title_list = list() # Keeps track of titles and duplicates
+    n = 0
 
     for word in words:
         result = dict()
@@ -57,7 +59,16 @@ def get_songs(words:List[str]) -> Dict:
                         result["album"] = "None"
 
                     results[word] = result
+                    
+                    # Ensures that the number of searches per second is not exceeded
+                    n += 1
+                    if n % 4 == 0:
+                        time.sleep(1.1)
+
         else:
+            if response.status_code == 503:
+                # NOTE: It is possible to return all the requests found so far instead of exception.
+                raise MusicBrainzAPIException(f"Error: Limit of requests per second was exceeded at MusicBrainz API.")
             raise MusicBrainzAPIException(f"Error: MusicBrainz API query returned {response.status_code}.")
         
     return results

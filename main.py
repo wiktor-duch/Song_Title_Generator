@@ -45,9 +45,9 @@ if __name__ == "__main__":
         try:
             songs = get_songs(random_words)
             break
-        except MusicBrainzAPIException:
+        except MusicBrainzAPIException as e:
             # Ask the user to try again
-            print("\nERROR: An error occured when communicating with MusicBrainz API.\n")
+            print(e)
             answer = input("Would you like to try again [yes/no]? ")
             
             # If the answer is negative, exit the application
